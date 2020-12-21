@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleLoopScope", "SimpleLoopScope.csproj", "{84867A26-1C65-4D24-B6E4-EE65C0480D6B}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{84867A26-1C65-4D24-B6E4-EE65C0480D6B}.Debug.ActiveCfg = Debug|.NET
+		{84867A26-1C65-4D24-B6E4-EE65C0480D6B}.Debug.Build.0 = Debug|.NET
+		{84867A26-1C65-4D24-B6E4-EE65C0480D6B}.Release.ActiveCfg = Release|.NET
+		{84867A26-1C65-4D24-B6E4-EE65C0480D6B}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

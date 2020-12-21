@@ -1,0 +1,1031 @@
+15
+Using Common Dialogs
+In the last two chapters we have looked at various aspects of programming Windows Forms applications, and seen how to implement such things as menus, toolbars, and SDI and MDI forms. We also know how to display simple message boxes to get information from the user, and how to create more sophisticated custom dialogs to ask the user for specific information. However, for common tasks such as opening and saving files, there are prewritten dialog classes that can be used instead of having to create your own custom dialog.
+
+This not only has the advantage of requiring less code, but also that it uses the familiar Windows dialogs, giving your application a standard look and feel. The .NET Framework has classes which hook up to the Windows dialogs to open and save files, to access printers, and to select colors and fonts. Using these dialogs instead of custom dialogs means that it's not necessary for you to have to learn the complex methodology that would be required to code such functionality from scratch.
+
+In this chapter we will learn how to use these standard dialog classes. In particular, we will:
+
+? Use the OpenFileDialog and SaveFileDialog classes
+? Learn about the .NET printing class hierarchy and we will use the PrintDialog, PageSetupDialog, and PrintPreviewDialog classes to implement printing and print preview
+? Look at how to change fonts and colors with the FontDialog and ColorDialog to change fonts and colors
+Common Dialogs
+A dialog is a window that is displayed within the context of another window. With a dialog we can ask the user to enter some data before we continue the flow of our program. A common dialog is a dialog that used to get information from the user that most applications will typically require, such as the name of a file, and is a part of the Windows operating system. 
+
+With the .NET Framework we have the following dialog classes:
+
+
+****Insert figure 4982_111_01.eps
+
+All these dialog classes, except the PrintPreviewDialog, derive from the abstract CommonDialog base class that has methods to manage a Windows common dialog. 
+
+The CommonDialog class defines the following methods and events common to all common dialog classes:
+
+Public Instance Methods and Events
+Description
+ShowDialog()
+This method is implemented from the derived class to display a common dialog.
+Reset()
+Every derived dialog class implements the Reset() method to set all properties of the dialog class to their default values.
+HelpRequest
+This event is thrown when the user clicks the Help button on a common dialog.
+
+All these dialog classes wrap up a Windows common dialog to make the dialog available for .NET applications. PrintPreviewDialog is an exception because it adds its own elements to a Windows Form to control the preview of a print, and hence is not really a dialog at all. The OpenFileDialog and SaveFileDialog classes derive from the abstract base class FileDialog that adds file features that are common to both the opening and closing file dialogs.
+
+Let's get an overview of how the different dialogs can be used:
+
+? To let the user select and browse files to open the OpenFileDialog is used. This dialog can be configured to allow the selection of a single file or multiple files.
+? With the SaveFileDialog the user can specify a filename and browse for a directory to save files.
+? The PrintDialog is used to select a printer and set the printing options.
+? To configure the margins of a page the PageSetupDialog usually is used.  
+? The PrintPreviewDialog is one way to preview on the screen what is to be printed on paper, with options such as zoom. 
+? The FontDialog lists all installed Windows fonts with styles and sizes, and a preview to select the font of choice. 
+? The ColorDialog class makes it easy to select a color.
+
+I have seen some applications developed (by the same company) where not only were the common dialogs not reused, but also no style guide for building custom dialogs was used. The development of these dialogs resulted in functionality that was not consistent, with some buttons and other controls found in different locations, such as the OK and Cancel buttons being reversed between dialogs. 
+Sometimes that inconsistency can also be found within one application. That's frustrating for the user and increases the time to do a task. 
+
+Be consistent in the dialogs you build and use! Consistency can be easy to attain by using the common dialogs. 
+How to use Dialogs
+As CommonDialog is the base class for the dialog classes, all the dialog classes can be used similarly. Public instance methods are ShowDialog() and Reset(). ShowDialog() invokes the protected RunDialog() instance method to display the dialog and finally returns a DialogResult instance with the information on how the user interacted with the dialog. Reset(), on the other hand, sets properties of the dialog class to their default values.
+
+The following code segment shows an example of how a dialog class can be used. Later, we will take a more detailed look at each of the steps, but first let's introduce the overall concept of how dialogs can be used.
+
+As you can see in the following code segment,
+
+? First a new instance of the dialog class is created.
+? Next, we have to set some properties to enable / disable optional features and set dialog state. In this case we set the Title property to "Sample", and the ShowReadOnly property to true.
+? By calling the ShowDialog() method, the dialog is displayed and waits and reacts to user inputs.
+? If the user presses the OK button the dialog is closed, and we check for the OK by comparing the result of the dialog with DialogResult.OK. After that we can get the values from the user input by querying for the specific property values. In this case we are storing the value of the FileName property in the fileName variable.
+
+OpenFileDialog dlg = new OpenFileDialog();
+dlg.Title = "Sample";
+dlg.ShowReadOnly = true;
+
+if (dlg.ShowDialog() == DialogResult.OK)
+{
+   string fileName = dlg.FileName;
+}  
+
+It's really that easy! Of course every dialog has its own configurable options, which we look at in the following sections.
+
+If you use a dialog from within a Windows Forms application in Visual Studio .NET, it's even easier than the few lines of code above. The Windows Forms designer creates the code to instantiate a new instance, and the property values can be set from the Properties window. We just have to call ShowDialog() and get to the changed values, as we shall see.
+File Dialogs
+With a file dialog the user can select a drive and browse through the file system to select a file. From the file dialog, all we want returned is a file name from the user.
+
+With the OpenFileDialog we can allow the user to select a name for the file that they want to open, whereas using the SaveFileDialog, allows the user to specify a name for a file that they want to save. These dialog classes are very similar since they derive from the same abstract base class, though there are some properties unique to each class. In this section, we will at first have a look at the features of the OpenFileDialog, and then we will look at where the SaveFileDialog differs. We will develop a sample application that uses both of them.
+OpenFileDialog
+The OpenFileDialog class enables the user to select a file to open. As we have seen in our example above, a new instance of the OpenFileDialog class is created before the ShowDialog() method is called. 
+
+OpenFileDialog dlg = new OpenFileDialog();
+dlg.ShowDialog();
+
+Running a Windows application program with these two code lines will result in this dialog:
+
+
+Insert screenshot 7582_15_01.bmp
+
+As we have seen already, we can set the properties of this class before calling ShowDialog(), which changes the behavior and appearance of this dialog, or limits the files that can be opened. In the next sections we will look at possible modifications.
+
+Note that if you want to use the OpenFileDialog with console applications, the System.Windows.Forms assembly must be referenced, and the System.Windows.Forms namespace must be included.
+Dialog Title
+The default title for the OpenFileDialog is Open. You can change the title of the dialog by setting the Title property. Open is not always the best name if, for example, in the application you want to analyze log files to check some information and to perform calculations on it, or to get file sizes, and after doing whatever processing is required, you close the files straight away afterwards. In this case the files don't stay opened for the user, so a title of Analyze Files would be better. Visual Studio .NET itself has different titles for the file open dialogs to differentiate the file types that are opened: Open Project, Open File, Open Solution, and Open File from Web.
+
+This code segment shows how a different title can be set. 
+
+OpenFileDialog dlg = new OpenFileDialog();
+dlg.Title = "Open File";
+dlg.ShowDialog();
+Specifying Directories
+By default, the dialog opens the directory that was opened by the user when they last ran the application, and displays the files in this directory. Setting the InitialDirectory property changes this behavior. The default value of InitialDirectory is an empty string, which represents the My Documents directory of the user, and is shown the first time that the dialog is used in the application. The second time that the dialog is opened, the directory shown will be the same one as for the previously opened file. The Windows common dialog called by the OpenFileDialog uses the Registry to locate the name of the previously opened file. 
+
+You should never use a hard-coded directory string in your application as this directory may not exist on the user's system. To get special system folders you can use the static method GetFolderPath() of the System.Environment class. The GetFolderPath() method accepts an Environment.SpecialFolder enumeration member that defines which system directory you want the path for. 
+
+In the following code example I'm using the common user directory for templates to set it as InitialDirectory.
+
+string dir = Environment.GetFolderPath(Environment.SpecialFolder.Templates);
+dlg.InitialDirectory = dir; 
+Setting the File Filter
+The file filter defines the file types that the user can select to open. A simple filter string can look like this:
+
+Text Documents (*.txt)|*.txt|All Files|*.*
+
+The filter is used to display the entries in the Files of type: list box. Microsoft WordPad displays these entries: 
+
+
+Insert screenshot 7582_15_03.bmp
+
+A filter has multiple segments that are separated with the pipe character (|). Two strings are required for each entry, so the number of segments should always be an even number. The first string for each entry defines the text that will be presented in the list box; the second string is used to specify the extension of the files to display in the dialog. We can set the filter string with the Filter property as in the code below:
+
+dlg.Filter = "Text documents (*.txt)|*.txt|All Files|*.*";
+
+Setting a wrong Filter value results in a runtime exception, System.ArgumentException, with the error message The provided filter string is invalid. A blank before or after the filter is also not allowed.
+
+The FilterIndex property specifies the number of the default selection in the list box. With WordPad the default selection is Rich Text Format (*.rtf) as highlighted in the screenshot above. If you have multiple file types to choose from then you can set the FilterIndex to the default file type. It's worth paying attention to the fact that the FilterIndex is one-based!
+Validation
+The OpenFileDialog can do some automatic validation of the file before you attempt to open it. When the ValidateNames property is true, the filename entered by the user is checked to see if it is a valid Windows filename. Pressing the OK button of the dialog with an invalid filename displays the following dialog, and the user must correct the filename or click Cancel to leave the OpenFileDialog. Invalid characters for a filename include characters such as \\, /, or :.
+
+
+
+Insert screenshot 7582_15_04.bmp
+
+With ValidateNames set to true, you can use CheckFileExists and CheckPathExists as additional validation. With CheckPathExists the path is validated, whereas CheckFileExists validates the file. If the file doesn't exist, the following dialog is displayed when the OK button is pressed: 
+
+
+Insert screenshot 7582_15_05.bmp
+
+The default for these three properties is true, so the validation happens automatically.
+Help
+The OpenFileDialog class supports a help button that is by default invisible. Setting the ShowHelp property to true makes this button visible, and you can add an event handler to the HelpRequest event to display help information to the user. 
+Results
+The ShowDialog() method of the OpenFileDialog class returns a DialogResult enumeration value. The DialogResult enumeration defines the members Abort, Cancel, Ignore, No, None, OK, Retry, and Yes. 
+
+None is the default value that is set as long as the user hasn't closed the dialog. Depending on the button pressed the corresponding result is returned. With the OpenFileDialog, only DialogResult.OK and DialogResult.Cancel are returned. 
+
+If the user pressed the OK button the selected file name can be accessed using the FileName property. If the user cancelled the dialog the FileName is just an empty string. If the Multiselect property is set to true so that the user can select more than one file you get all the selected filenames by accessing the FileNames property, which returns a string array.
+
+Note that FileNames property contains the file in the reverse order to which they were selected - thus the first string in FileNames array is the last file selected. Also, the FileName property always contains the file name of the last file that is selected.
+
+This small code extract shows how multiple file names can be retrieved from an OpenFileDialog:
+
+   OpenFileDialog dlg = new OpenFileDialog();
+   dlg.Multiselect = true;
+
+   if (dlg.ShowDialog() == DialogResult.OK)
+   {
+      foreach (string s in dlg.FileNames)
+      {
+         // now display the filenames in a list box
+         this.listBox1.Items.Add(s);
+      }
+   }
+
+The ShowDialog() method opens up the dialog. Because the Multiselect property was set to true, the user can select multiple files. Pressing the OK button of the dialog ends the dialog if all goes well, and DialogResult.OK is returned. With the foreach statement, we go through all strings in the string array that is returned from the FileNames property to display every selected file.
+OpenFileDialog Properties
+In summary, the diagram below shows the OpenFileDialog with its properties - you can easily see what properties influence which user interface elements.
+
+
+****Insert figure 4982_111_02.eps. 
+Try it Out - Creating the Simple Text Editor Windows Application
+To demonstrate the use of the standard dialogs we will create a simple text editor Windows application called SimpleEditor, that will allow the user to load, save, and edit text files. As we progress further through the chapter, we will also see how to print the text file. First we'll start by seeing how to use the open and save file dialogs.
+
+1. Create a new Windows application called SimpleEditor in the directory C:\BegVCSharp\Chapter15. 
+2. Rename the generated file Form1.cs to SimpleForm.cs and the class Form1 to SimpleEditorForm. I'm also changing the namespace to Wrox.Editor.
+Don't forget that when changing the name of the class you also have to change the implementation of the Main() method to reflect the name change, because this isn't changed automatically by setting the Name property of the Form class:
+      [STAThread]
+      static void Main() 
+      {
+         Application.Run(new SimpleEditorForm());
+      }
+3. Set the Text property of the form to Simple Editor, and change its Size to 570,270. A multi-line text box will be the area to read and modify the data of the file, so add a TextBox from the toolbox to the Windows Forms designer. The text box should be multi-line and should cover the complete area of the application, so set these properties to the specified values:
+
+Property
+Value
+(Name)
+textBoxEdit
+Text
+
+Multiline
+True
+Dock
+Fill
+ScrollBars
+Both
+AcceptsReturn
+True
+AcceptsTab
+True
+ 
+4. Next, we add a MainMenu to the application. The main menu should have a File entry with sub menus New, Open, Save, and Save As, as the following graphic demonstrates:
+
+
+Insert screenshot 7582_15_08.bmp
+
+The ... in the Text property of the Open and Save As menu entries advises the user that they will be asked for some data before the action happens. When choosing the File, New, and Save menus the action happens without additional intervention.
+
+Menu item Name
+Text
+miFile
+&File
+miFileNew
+&New
+miFileOpen
+&Open...
+miFileSave
+&Save
+miFileSaveAs
+Save &As...
+
+5. The handler for the menu entry &New should clear the data of the text box by calling the Clear() method of the TextBox:
+      private void miFileNew_Click(object sender, System.EventArgs e)
+      {
+         fileName = "Untitled"; 
+         textBoxEdit.Clear();
+      }
+6. Also, the fileName member variable should be set to "Untitled". We must declare and initialize this member variable in the SimpleEditorForm class:
+      private string fileName = "Untitled";
+
+With the SimpleEditor it should be possible to pass a filename as an argument when starting the application. The filename passed should be used to open the file and display it in the textbox.
+
+7. Change the implementation of the Main() method so that a argument can be passed.
+      static void Main(string[] args) 
+      {
+         string fileName = null;
+         if (args.Length != 0)
+            fileName = args[0];
+         Application.Run(new SimpleEditorForm(fileName));
+      }  
+
+8. Now we also have to change the implementation of the SimpleEditorForm constructor to use a string:
+      public SimpleEditorForm(string fileName)
+      {
+         //
+         // Required for Windows Form Designer support
+         //
+         InitializeComponent();
+
+         if (fileName != null)
+         {
+            this.fileName = fileName;
+            OpenFile();
+         }
+      }
+
+9. And we have to implement the OpenFile() method that opens a file and fills the textbox with data from the file.
+Note that the OpenFile() method actually accesses the file in question, and uses methods that we will not discuss at length here. The subject of accessing files is covered in Chapter 20, and we will not talk too much about such things so as not to interrupt our coverage of the dialogs.
+
+      protected void OpenFile()
+      {
+         try
+         {
+            using (StreamReader reader = File.OpenText(fileName))
+            {
+               textBoxEdit.Clear();
+               textBoxEdit.Text = reader.ReadToEnd();
+        
+            }
+         }
+         catch (IOException ex)
+         {
+            MessageBox.Show(ex.Message, "Simple Editor", 
+               MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+         }
+      }
+
+Here we use the StreamReader, and File classes to read the file - these classes are in the System.IO namespace, so we also need to add the following using directive at the start of our program:
+using System.IO;
+
+The StreamReader class and the System.IO namespace will be explored in Chapter 20 along with other file access classes.
+10. As we saw in Chapter 7, it's possible to define command line parameters within Visual Studio .NET for debugging purposes. In the Solution Explorer you just have to select the project, and choose Project | Properties. If you select Configuration Properties | Debugging in the left tree you can enter the Command Line Arguments. For testing purposes here, enter the following:
+C:\BegVCSharp\Chapter15\SimpleEditor\AssemblyInfo.cs
+11. Now we can run the application, and the AssemblyInfo.cs file of our current project will be opened immediately and displayed, as can be seen in the screenshot below:
+
+Insert screenshot 7582_15_100.bmp
+How it Works
+The first six steps simply set up the form - you should be familiar with this process from the previous two chapters, and we will not discuss these steps any further.
+
+Step 7 is where the meat of our application begins. By adding the string[] to the parameters of the Main() method we can use any command line arguments that the user supplied when starting the application.
+
+      static void Main(string[] args) 
+
+In the Main() method we check to see if arguments are passed by using the Length property. If at least one argument was passed, the first argument is set to the fileName variable which is then passed to the constructor of the SimpleEditorForm.
+     {
+         string fileName = null;
+         if (args.Length != 0)
+            fileName = args[0];
+         Application.Run(new SimpleEditorForm(fileName));
+      }  
+
+In the SimpleEditorForm constructor we check if the filename variable already has a value set. If it has, we set the member variable fileName and call the OpenFile() method to open the file. We use a separate OpenFile() method, and don't write the calls to open the file and fill the textbox directly in the constructor of the class because  OpenFile() can be used again in other parts of the program.
+         if (fileName != null)
+         {
+            this.fileName = fileName;
+            OpenFile();
+         }
+
+In the OpenFile() method we read the data from the file. We use the static method OpenText() of the File class to open a file and get a StreamReader returned. The StreamReader class is then used to read the file with ReadToEnd(), which loads the text as a string that is passed to the TextBox object. The StreamReader should be closed after use to free managed and unmanaged resources. We do this with the using statement. using calls Dispose() at the end of the block, and the Dispose() implementation of the StreamReader class calls Close() to close the file. 
+
+            using (StreamReader reader = File.OpenText(fileName))
+            {
+               textBoxEdit.Clear();
+               textBoxEdit.Text = reader.ReadToEnd();
+            }
+
+Because file operations can easily generate exceptions, caused, for example, by the user not having the right access permissions to the file, the code is wrapped in a try block. In the case of an IO exception a message box shows up to inform the user about the problem, but the application keeps running.
+
+         try
+         {
+            //...
+         }
+         catch (IOException ex)
+         {
+            MessageBox.Show(ex.Message, "Simple Editor", 
+               MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+         }
+
+If we enter a non-existent filename for the command-line argument when starting the application, this message box is displayed:
+
+
+Insert screenshot 7582_15_08c.bmp
+Try it out - Adding and Using an Open File Dialog
+Now we can read files with the simple editor by passing a filename when starting the application. Of course, we would prefer to use a common dialog class, which we will add next to our application.
+
+1. In the Windows Forms category of the toolbox we can find the OpenFileDialog component. Drag this component from the Toolbox and dropped onto the form in the Windows Forms designer. Here we'll just change three properties: the name for the instance to dlgOpen, the Filter property will be set to the following string, and the FilterIndex property is set to 2 to make Wrox Documents the default selection:
+Text Documents (*.txt)|*.txt|Wrox Documents (*.wroxtext)|*.wroxtext|All Files|*.*
+2. Add a handler to the click event of the Open menu entry in which we display the dialog and read the selected file with this code:
+      private void miFileOpen_Click(object sender, System.EventArgs e)
+      {
+         if (dlgOpenFile.ShowDialog() == DialogResult.OK)
+         {
+            fileName = dlgOpenFile.FileName;
+            OpenFile();
+         }
+      }  
+How it Works
+By adding the OpenFileDialog component to the Windows Forms designer, a new private member is added to the SimpleEditorForm class:
+
+   public class SimpleEditorForm : System.Windows.Forms.Form
+   {
+      private System.Windows.Forms.TextBox textBoxEdit;
+      private System.Windows.Forms.MenuItem miFile;
+      private System.Windows.Forms.MenuItem miFileNew;
+      private System.Windows.Forms.MenuItem miFileOpen;
+      private System.Windows.Forms.MenuItem miFileSave;
+      private System.Windows.Forms.MenuItem miFileSaveAs;
+      private System.Windows.Forms.MainMenu mainMenu;
+      private System.Windows.Forms.OpenFileDialog dlgOpenFile; 
+
+In the region of designer code by the Windows Forms, in InitializeComponent(), a new instance of this OpenFileDialog class is created, and the specified properties are set. Click on the + character of the line Windows Forms Designer generated code and then on the + character of the line private void InitializeComponent() to see the following code.
+
+      private void InitializeComponent()
+      {
+         this.textBoxEdit = new System.Windows.Forms.TextBox();
+         this.mainMenu = new System.Windows.Forms.MainMenu();
+         this.miFile = new System.Windows.Forms.MenuItem();
+         this.miFileNew = new System.Windows.Forms.MenuItem();
+         this.miFileOpen = new System.Windows.Forms.MenuItem();
+         this.miFileSave = new System.Windows.Forms.MenuItem();
+         this.miFileSaveAs = new System.Windows.Forms.MenuItem();
+         this.dlgOpenFile = new System.Windows.Forms.OpenFileDialog();
+         // ...
+         // 
+         // dlgOpenFile
+         // 
+         this.dlgOpenFile.Filter = 
+            "Text Documents (*.txt)|*.txt|Wrox Documents (*.wroxtext)|*.wroxtext|All Files|*.*";
+         this.dlgOpenFile.FilterIndex = 2;
+
+Of course all that has happened here is exactly as we would expect if we dragged any another standard control onto our form, but with the support of the Windows Forms designer we have created a new instance of the OpenFileDialog and set the properties. Now we have to display the dialog.
+
+The ShowDialog() method displays the file open dialog and returns the button that the user pressed. We do nothing if the user presses anything other than the OK button. That's the reason why we check for DialogResult.OK in the if statement. If the user cancels the dialog we just do nothing.
+
+         if (dlgOpenFile.ShowDialog() == DialogResult.OK)
+         {
+
+Next we get the selected filename by accessing the FileName property of the OpenFileDialog class and setting the member variable fileName to this value. This is the value that's used by the OpenFile() method. It would also be possible to open the file directly with the OpenFileDialog class by calling dlgOpenFile.OpenFile() that already returns a Stream object, but as we already have a OpenFile() method that opens and reads a file we will use this.
+
+            fileName = dlgOpenFile.FileName;
+            OpenFile();
+
+Now we can start our simple editor program. Only the New and Open... menu entries are functional at the moment. Save and Save As... will be implemented in the next section.
+
+
+Insert screenshot 7582_15_09.bmp
+
+Selecting the menu entry File | Open... the OpenFileDialog shows up and we can select a file. I assume you currently don't have files with the file extension .wroxtext. Up to this time we cannot save files, so you can choose a different file type in the dialog editor to open a file, or you can copy a text file to a file with the extension .wroxtext.
+
+Insert screenshot 7582_15_10.bmp
+
+Select a text file and pressing the Open button, the text shows up in the text box of the dialog. I selected a sample text file, GlobalKnowledge.txt on my local system, as can be seen in the picture below.
+
+
+Insert screenshot 7582_15_11.bmp
+
+At this point, we can only read existing files. Now it would be great to create new files and modify existing ones. We will use the SaveFileDialog to do this now.
+SaveFileDialog
+The SaveFileDialog class is very similar to the OpenFileDialog and they have a set of common properties - we will not talk about those properties that operate in the same way as those of the OpenFileDialog. Instead, we will focus on the properties specific to the save dialog and where the application of the common properties differs.
+Title
+With the Title property you can set the title of the dialog similar to the OpenFileDialog. If nothing is set the default title is Save As.
+File Extensions
+File extensions are used to associate files with applications. It is best to add a file extension to a file, otherwise Windows won't be able to know which application should be used to open the file, and it's likely that you would also eventually forget this.
+
+AddExtension is a Boolean property that defines if the file extension should be automatically added to the file name the user enters - the default value is true. If the user enters a file extension, no additional extension will be appended. Thus with AddExtension set to true, if the filename test entered by the user, the filename test.txt will be stored. If the filename test.txt is entered, the filename will still be test.txt, and not test.txt.txt. 
+
+The DefaultExt property sets the file extension that will be used if the user doesn't enter one. If you leave the property blank the file extension that's defined with the currently selected Filter will be used instead. If you set both a Filter and the DefaultExt, the DefaultExt will be used regardless of the Filter
+Validation
+For automatic file name validation we have the properties ValidateNames, CheckFileExists, and CheckPathExists, as with the OpenFileDialog. The difference between OpenFileDialog and SaveFileDialog is that with the SaveFileDialog the default value for CheckFileExists is false which means you can supply the name of a brand new file to save.
+Overwriting Existing Files
+As we have seen, the validation of file names is similar to that of the OpenFileDialog. However, for the SaveFileDialog class, there is more checking to do and some more properties to set. First, if the CreatePrompt property is set to true the user will be asked if a new file is to be created. If the OverwritePrompt property is set to true, that means that the user is asked if he really wants to overwrite an already existing file. The default setting for OverwritePrompt is true, and CreatePrompt is false. With this setting the following dialog is displayed if the user wants to save an already existing file:
+
+
+Insert screenshot 7582_15_12.bmp
+SaveFileDialog Properties
+Here is a diagram summarizing the properties of the SaveFileDialog:
+
+
+****Insert figure 4982_111_03.eps..
+Try it out - Add a SaveFileDialog
+3. In the same way that we could add a OpenFileDialog to our form, so we can add a SaveFileDialog: select the SaveFileDialog component from the Toolbox and drop it onto the form. Change the name to dlgSaveFile, FileName to Untitled, the FilterIndex to 2, and the Filter property to the following string as we did with the OpenFileDialog earlier. As we only want to allow the file extensions .txt and .wroxtext to be saved with this editor, *.* will now be left out.
+Text Document (*.txt)|*.txt|Wrox Documents (*.wroxtext)|*.wroxtext
+
+4. Double-click on the Save As menu entry to add handler for its Click, and then add the following code. In this code we will display the SaveFileDialog with the ShowDialog() method. As with the OpenFileDialog, we are only interested in the results if the user has pressed the OK button. We call the SaveFile()method that stores the file to the disk. This method will have to be implemented in the next step.
+      private void miFileSaveAs_Click(object sender, System.EventArgs e)
+      {
+         if (dlgSaveFile.ShowDialog() == DialogResult.OK)
+         {
+            fileName = dlgSaveFile.FileName;
+            SaveFile();
+         }
+      }
+
+5. Add the SaveFile() method as can be seen here to your file:
+      protected void SaveFile()
+      {
+         try
+         {
+            Stream stream = File.OpenWrite(fileName);
+            using (StreamWriter writer = new StreamWriter(stream))
+            {
+               writer.Write(textBoxEdit.Text);
+            }
+         }
+         catch (IOException ex)
+         {
+            MessageBox.Show(ex.Message, "Simple Editor", 
+               MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+         }
+      }
+
+Similar to the OpenFile() method we use the File class to open the file, but now we open it for write access with OpenWrite(). OpenWrite() returns a Stream object that is passed to the constructor of the StreamWriter class. The Write() method of the StreamWriter writes all the data of the textBox to the file. At the end of the using block the StreamWriter gets closed. Because the stream object is associated with the writer, the stream gets closed too, and no additional Close() for the stream is needed.
+Again, you can read more about the classes used for file access in Chapter 20.
+6. After building the project we can start the application using the Debug | Start menu of Visual Studio .NET. Write some text to the textbox and choose the menu File | Save As... as shown in the picture below.
+
+
+Insert screenshot 7582_15_14.bmp
+
+The SaveFileDialog as shown below will pop up. Now you can save the file and open it again to make some more changes.
+
+Insert screenshot 7582_15_14a.bmp
+7. We can do a Save As, but the simple Save isn't available at the moment. Add a handler to the Click event of the Save menu entry and add this code:
+
+      private void miFileSave_Click(object sender, System.EventArgs e)
+      {
+         if (fileName == "Untitled")
+         {
+            miFileSaveAs_Click(sender, e);
+         }
+         else
+         {
+            SaveFile();
+         }
+      }
+How it Works
+With the Save menu, the file should be saved without opening any dialog. There's one exception to this rule, in that if a new document is created and the user did not supply a filename, then the Save handler should work as the Save As handler does and display the save file dialog.
+
+With the fileName member variable we can easily check if a file is opened or if the file name is still set to the initial value Untitled after creating a new document. If the if statement returns true we call the handler miFileSaveAs_Click() that we implemented previously for the Save As menu. 
+
+In the other case when a file was opened and the user now chooses the Save menu, the thread of execution passes into the else block. We can use the same SaveFile() method that we implemented previously. 
+Try it out - Set the Title of the Form
+With Notepad, Word, and other Windows applications the name of the file that's currently edited is displayed in the title of the application. We should add this feature too. 
+
+8. Create a new member function SetFormTitle() and add this implementation:
+      protected void SetFormTitle()
+      {
+         FileInfo fileinfo = new FileInfo (fileName);
+         this.Text = fileinfo.Name + " - Simple Editor";
+      }
+
+The FileInfo class is used to get the file name without the preceding path that's stored in the fileName variable. The FileInfo class and the StreamWriter class are covered in Chapter 20.
+9. Add a call to this method in the miFileNew_Click(), miFileOpen_Click(), and miFileSaveAs_Click() handler after setting the member variable fileName as can be seen in the following code segments: 
+      private void miFileNew_Click(object sender, System.EventArgs e)
+      {
+         fileName = "Untitled";
+         SetFormTitle();
+         textBoxEdit.Clear();
+      }
+
+      private void miFileOpen_Click(object sender, System.EventArgs e)
+      {
+         if (dlgOpenFile.ShowDialog() == DialogResult.OK)
+         {
+            fileName = dlgOpenFile.FileName;
+            SetFormTitle();
+            OpenFile();
+         }
+      }
+
+      private void miFileSaveAs_Click(object sender, System.EventArgs e)
+      {
+         if (dlgSaveFile.ShowDialog() == DialogResult.OK)
+         {
+            fileName = dlgSaveFile.FileName;
+            SetFormTitle();
+            SaveFile();
+         }
+      }
+How it Works
+Every time the file name changes the Text property of the actual form will be changed to the file name appended with the name of the application. 
+
+Starting the application now you see the following screen. Here, as I'm editing the file sample.txt, this information is displayed in the title of the form.
+
+
+Insert screenshot 7582_15_16.bmp
+
+Now we have a simple editor - we can open, create, and save files (and edit them too). So are we finished? Not really! Because the paperless office still doesn't exist, we should add some print functionality!
+Printing
+With printing we there are many things to worry about, such as the selection of a printer, page settings, and how to print multiple pages. By using classes from the System.Drawing.Printing namespace, we can get a lot of help to solve these problems, and print documents from our own applications with ease. 
+
+Before we look at the PrintDialog class that makes it possible to select a printer we must take a quick look at how .NET handles printing. The foundation of printing is the PrintDocument class which has a method Print() that starts a chain of calls culminating in a call to OnPrintPage(), which is responsible for passing the output to the printer. However, before we go deeper into how we implement printing code, let us look in a little bit more detail at the .NET printing classes.
+Printing Architecture
+The following diagram shows the major parts of the printing architecture in a diagrammatic form, which shows the relations between the classes and some of the properties and methods.
+
+
+****Insert figure 7582_15_100.eps
+
+Let's look at the functionality of these classes.
+
+? Let's start with the most important class, PrintDocument. In the diagram you can see that nearly all other classes have a relationship with this class. To print a document an instance of PrintDocument is required. In a moment we'll have a look at the printing sequence initiated by this class.
+? The PrintController class controls the flow of a print job. From starting the print job, the print controller has events for the start of the print, for each page, and for the end of the print. The class is abstract since the implementation of normal printing is different from that of print preview.
+? With the PrinterSettings class we can get and set the printer configurations such as duplex printing, landscape or portrait, and number of copies. 
+? Which printer to print to and how the PrinterSettings should be configured is a job of the PrintDialog class. This class is derived from CommonDialog like the other dialog classes we have already dealt with.
+? The PageSettings class specifies the sizes and boundaries of a page, and if the page is in black and white or color. The configuration of this class can be done with the PageSetupDialog class that again is a CommonDialog.
+Printing Sequence
+Now that we know about the roles of the classes in the printing architecture, let's look at the main printing sequence. The diagram below shows the major players - our application, an instance of the PrintDocument class, and a PrintController in a timely sequence.
+
+
+****Insert figure 7582_15_101.eps
+
+The application has to call the Print() method of the PrintDocument. This starts the printing sequence. As the PrintDocument itself is not responsible for the printing flow, the job is given to the PrintController by calling the Print() method of this class. 
+The print controller now takes the action and informs the PrintDocument that the printing has started by calling OnBeginPrint(). If our application should do something at the start of a print job, we have to register an event handler in the PrintDocument so that we get informed in our application class. In the diagram above it is assumed that we registered the handler OnBeginPrint(), so this handler is called from the PrintDocument class. 
+
+After the beginning phase has ended, the PrintController goes into a PrintLoop() to call the method OnPrintPage() in the PrintDocument class for every page to print. OnPrintPage() invokes all PrintPage event handlers. We have to implement such a handler in every case otherwise nothing would be printed. In the diagram above you can see the handler is called OnPrintPage().
+
+After the last page printed the PrintController calls OnEndPrint() in the PrintDocument class. Optionally, we can implement a handler to be invoked here, too. 
+
+To summarize, the most important thing for us to know is:
+We can implement the printing code in the PrintDocument.PrintPage event handler. This will be called for every page that is to be printed. If there's printing code that should be called only once for a print job, we have to implement the BeginPrint and EndPrint event handlers.
+PrintPage Event
+So what we know now is that we have to implement an event handler for the PrintPage event. The delegate PrintPageEventHandler defines the arguments of the handler:
+
+public delegate void PrintPageEventHandler(object sender, 
+                                           PrintPageEventArgs e);
+
+As you can see, we receive an object of type PrintPageEventArgs. You can have a look back to the class diagram to see the main properties of this class. This class has associations to the PageSettings and Graphics classes; the first enables us to set the paper size, the margins, and we can get device information from the printer. The Graphics class, on the other hand, makes it possible to access the device context of the printer and send such things as strings, lines, and curves to the printer. 
+
+GDI stands for Graphics Device Interface and makes it possible to do some graphical output to a device like the screen or a printer. GDI+ is the next generation of GDI that adds features like gradient brushes and alpha blending, and is the drawing technology of the .NET Framework. 
+In the next chapter you can read more about drawing with GDI+ and the Graphics class.
+
+If at this point you think that printing is complex, don't be worried! The following example should convince you that adding printing features to an application is quite an easy task.
+
+Before we can add the PrintDialog we have to add some menu entries for printing. Add two separators and a Print, Print Preview, Page Setup, and Exit menu items to our Simple Editor application. 
+
+Here the Name and Text properties of the new menu items are listed:
+
+Menu Item Name
+Text
+miFilePrint
+&Print...
+miFilePrintPreview
+Print Pre&view...
+miFilePageSetup
+Page Set&up...
+miFileExit
+E&xit
+
+The menu should look like the following screenshot:
+
+
+Insert screenshot 7582_15_18.bmp
+
+Try it Out - Add a PrintDocument Component and a Handler
+10. Before we go any further, add the following using directive to the start of your code so we can make use of the classes for printing:
+using System.Drawing.Printing;
+
+11. Drag a PrintDocument component from the toolbox and drop it to the form. Change the Name to printDocument and add an event handler OnPrintPage() to the PrintPage event by selecting the Events button in the Properties window. Then add the following code to the implementation of the event handler:
+
+      private void OnPrintPage(object sender,
+                               System.Drawing.Printing.PrintPageEventArgs e)
+      {
+         char[] param = {'\n'};
+         string[] lines = textBoxEdit.Text.Split(param);
+
+         int i = 0;
+         char[] trimParam = {'\r'};
+         foreach(string s in lines)
+         {
+            lines[i++] = s.TrimEnd(trimParam);
+         } 
+
+         int x = 20;
+         int y = 20;
+         foreach (string line in lines)
+         {
+            e.Graphics.DrawString(line, new Font("Arial", 10), 
+               Brushes.Black, x, y);
+            y += 15;
+         }
+      }
+
+12. Then add a handler to the Click event of the Print menu to call the Print() method of the PrintDocument class.
+      private void menuItemFilePrint_Click(object sender, 
+                                           System.EventArgs e)
+      {
+         printDocument.Print();
+      }
+
+13. Now you can build and start the application and print a document. Of course, you must have a printer installed for the example to work.
+How it Works
+The Print() method of the printDocument object invokes the PrintPage event of the printDocument with the help of the PrintController class.
+
+         printDocument.Print();
+
+In the OnPrintPage() handler, we split up the text in the text box line by line using the String.Split() method and the newline character \n. The resultant strings are written to the string array lines.
+
+         char[] param = {'\n'};
+         string[] lines = textBoxEdit.Text.Split(param);
+
+Depending on how the text file was created, the lines are not only separated with the \n (newline) character, but also the \r (return) character. With the TrimEnd() method of the string class the character \r is removed from every string:
+
+         int i = 0;
+         char[] trimParam = {'\r'};
+         foreach(string s in lines)
+         {
+            lines[i++] = s.TrimEnd(trimParam);
+         }
+
+In the second foreach statement in the code below, you can see that we go through all lines and send every line to the printer by a call to e.Graphics.DrawString(). e is a variable of type PrintPageEventArgs where the property Graphics is connected to the printer context. The printer context makes it possible to draw to a printing device; the Graphics class has some methods to draw into this context. 
+
+As we cannot yet select a printer, the default printer, whose details are stored in the Windows Registry, is used. 
+
+With the DrawString() method we use the Arial font with a size of 10 points and a black brush for the print output. The position for the output is defined with the x and y variables. The horizontal position is fixed to 20 pixels; the vertical position is incremented with every line.
+
+         int x = 20;
+         int y = 20;
+         foreach (string line in lines)
+         {
+            e.Graphics.DrawString(line, new Font("Arial", 10), 
+                                  Brushes.Black, x, y);
+            y += 15;
+         }
+
+The printing we have done so far has its problem:
+
+? Printing multiple pages doesn't work. If the document to print spans multiple pages, only the first page gets printed. It would also be nice, if a header (for example, the file name) and footer (for example, the page number) were printed.
+? Page boundaries are fixed to hard-coded values in our program. To let the user set values for other page boundaries we use the PageSetupDialog class.
+? The print output is sent to the default printer, as set by through the Control Panel by the user. It would be better for our application to allow the user to choose a printer. We will use the PrintDialog class for this problem.
+? The font is fixed. To enable the user to choose the font, we can use the FontDialog class, which we will look at later in more detail.
+
+So let's continue with the printing process to get these items fixed.
+Printing Multiple Pages
+The PrintPage event gets called for every page to print. We just have to inform the PrintController that the current page printed was not the last page by setting the HasMorePages property of the PrintPageEventArgs class to true.
+Try it out - Modify OnPrintPage for Multiple Pages
+14. You must also declare a member variable lines of type string[] and a variable linesPrinted of type int in the class SimpleEditorForm:
+      private string[] lines;
+      private int linesPrinted;
+
+15. Modify the OnPrintPage() handler. In the previous implementation of OnPrintPage() we split the text into lines. Because the OnPrintPage()method is called with every page, and splitting the text to the lines is just needed once at the beginning of the printing operation. Remove all the code from OnPrintPage() and replace it with the new implementation:
+      private void OnPrintPage(object sender, 
+                               System.Drawing.Printing.PrintPageEventArgs e)
+      {
+         int x = 20;
+         int y = 20;
+         
+         while (linesPrinted < lines.Length)
+         {
+            e.Graphics.DrawString (lines[linesPrinted++], 
+                       new Font("Arial", 10), Brushes.Black, x, y);
+            y += 15;
+            if (y >= e.PageBounds.Height - 80)
+            {
+               e.HasMorePages = true;
+               return;
+            }
+         }
+
+         linesPrinted = 0;
+         e.HasMorePages = false;
+      }
+16. Add an event handler to BeginPrint event of the printDocument object called OnBeginPrint(). OnBeginPrint() is called just once for each print job and here we create our lines array:
+      private void OnBeginPrint(object sender, 
+                                System.Drawing.Printing.PrintEventArgs e)
+      {
+         char[] param = {'\n'};
+         lines = textBoxEdit.Text.Split(param);
+
+         int i = 0;
+         char[] trimParam = {'\r'};
+         foreach (string s in lines)
+         {
+            lines[i++] = s.TrimEnd(trimParam);
+         }
+      }
+17. After building the project you can start a print job of a multi-page document. 
+How it Works
+Starting the print job with the Print() method of the PrintDocument in turn calls OnBeginPrint() once and OnPrintPage() for every page.
+
+In OnBeginPrint() we split up the text of the text box into a string array. Every string in the array represents a single line because we split it up at the newline (\n) character and removed the carriage return character (\r), as we've done before.
+
+         char[] param = {'\n'};
+         lines = textBoxEdit.Text.Split(param);
+
+         int i = 0;
+         char[] trimParam = {'\r'};
+         foreach (string s in lines)
+         {
+            lines[i++] = s.TrimEnd(trimParam);
+         }
+
+OnPrintPage() is called after OnBeginPrint(). We want to continue printing as long as the number of lines printed is less than the total number of lines we have to print. The lines.Length property returns the number of strings in the array lines. The linesPrinted variable gets incremented with every line we send to the printer.
+
+         while (linesPrinted < lines.Length)
+         {
+            e.Graphics.DrawString(lines[linesPrinted++], 
+                       new Font("Arial", 10), Brushes.Black, x, y);
+
+After printing a line, we check if the newly calculated vertical position is outside of the page boundaries. Additionally, we decrement the boundaries by 80 pixels, because we don't really want to print to the very end of the paper, particularly since many printers can't do this anyway. If this position is reached, the HasMorePages property of the PrintPageEventArgs class is set to true in order to inform the controller that the OnPrintPage() method must be called once more, and another page needs to be printed - remember that PrintController has the PrintLoop() method that has a sequence for every page to print, and PrintLoop() will stop if HasMorePages is false. (The default value of the HasMorePages property is false so that only one page is printed).
+
+            y += 15;
+            if (y >= e.PageBounds.Height - 80)
+            {
+               e.HasMorePages = true;
+               return;
+            }
+Page Setup
+The margins of the page so far are hard-coded in the program. Let's modify the application to allow the user to set the margins on a page. To make this possible another dialog class is available: PageSetupDialog.
+
+This class makes it possible to configure paper sizes and sources, orientation, paper margins, and because these options depend on a printer, the selection of the printer can be done from this dialog too. 
+
+The following picture gives an overview about the properties that enable or disable specific options of this dialog and what properties can be used to access the values. We will discuss these properties in a moment:
+
+
+****Insert figure 4982_111_05.eps.
+
+Paper
+A value of true for the AllowPaper property means that the user can choose paper size and paper source. The PageSetupDialog.PageSettings.PaperSize property returns a PaperSize instance where we can read the height, width, and name of the paper with the properties Height, Width, and PaperName. PaperName specifies names like Letter, and A4. The Kind property returns an enumeration where we can get a value of the PaperKind enumeration. This can be one of three values representing European, American, or Japanese paper sizes. 
+
+The PageSetupDialog.PageSettings.PaperSource property returns a PaperSource instance where we can read the name of the printer paper source and the type of paper that fits in there (as long as the printer is correctly configured with the printer settings).
+Margins
+Setting the AllowMargins property to true allows the user to set the margin value for the printout. We can define minimum values for the user to enter by specifying the MinMargins property. To read the margins, we use the PageSetupDialog.PageSettings.Margins property. The returned Margins object has Bottom, Left, Right, and Top properties.
+Orientation
+The AllowOrientation property defines if the user can choose between portrait and landscape printing. The selected value can be read by querying the value of PageSetupDialog.PageSettings.Landscape which is a Boolean value specifying landscape mode with true and portrait mode with false.  
+Printer
+The AllowPrinter property defines if the user can choose a printer. Depending on the value of this property the Printer button is enabled (true) or not (false). The handler to this button in turn opens up the PrintDialog that we will use next.
+Try it Out - Add a Page Setup Dialog
+18. Drag a PageSetupDialog component from the Toolbox and drop it onto the form in the Windows Forms designer. Set its Name to dlgPageSetup, and the Document property to printDocument to associate the dialog with the document to print.
+19. Now add a Click event handler to the Page Setup menu entry and add the code below to display the dialog using the ShowDialog() method. It's not necessary to check the return value of ShowDialog() here because the implementation of the handler for the OK click event already sets the new values in the associated PrintDocument object. 
+      private void menuItemFilePageSetup_Click(object sender, 
+                                               System.EventArgs e)
+      {
+         dlgPageSetup.ShowDialog();
+      }
+20. Now change the implementation of OnPrintPage() to use the margins that are set by the PageSetupDialog. In our code, the x and y variables are set to the properties MarginBounds.Left and MarginBounds.Top of the PrintPageEventArgs class. We check the boundary of a page with MarginBounds.Bottom.
+      private void OnPrintPage(object sender, 
+                               System.Drawing.Printing.PrintPageEventArgs e)
+      {
+         int x = e.MarginBounds.Left;
+         int y = e.MarginBounds.Top;
+
+         while (linesPrinted < lines.Length)
+         {
+            e.Graphics.DrawString(lines[linesPrinted++], 
+               new Font("Arial", 10), Brushes.Black, x, y);
+
+            y += 15;
+            if (y >= e.MarginBounds.Bottom)
+            {
+               e.HasMorePages = true;
+               return;
+            }
+         }
+
+         linesPrinted = 0;
+         e.HasMorePages = false;
+      }
+
+21. Now you can build the project and run the application. Selecting File | Page Setup displays the following dialog. You can change the boundaries and print with the configured boundaries.
+
+
+Insert screenshot 7582_15_20.bmp
+If the display of the PageSetupDialog fails, an exception of type System.ArgumentException is thrown; this is probably because you forgot to associate the PrintDocument object with the PageSetupDialog. The PageSetupDialog needs an associated PrintDocument to query and set the values that are displayed in the dialog.
+Print Dialog
+The PrintDialog class allows the user to select a printer from the installed printers, and choose a number of copies, and some printer settings like the layout and paper sources of the printer. Because the PrintDialog is very easy to use, we will start immediately by adding the PrintDialog to our Editor application.
+Try it out - Add a PrintDialog
+
+22. Add a PrintDialog component from the Toolbox onto the form. Set the Name to dlgPrint and the Document property of this object to printDocument.
+Change the implementation of the event handler to the click event of the Print menu to the following code.
+      private void miFilePrint_Click(object sender, System.EventArgs e)
+      {
+         if (dlgPrint.ShowDialog() == DialogResult.OK)
+         {
+            printDocument.Print();
+         }
+      }
+23. Build and run the application. Selecting File | Print opens up the PrintDialog. Now you can select a printer to print the document.
+
+Insert screenshot 7582_15_21.bmp
+Options for the Print Dialog
+In our SimpleEditor program we didn't change any of the properties of the PrintDialog. But this dialog has some options, too. In the dialog above you can see three groups: Printer, Print range, and Copies.
+
+? In the Printer group not only the printer can be chosen, but there's also a Print to File option. By default this option is enabled, but it is not checked. Selecting this check box enables the user to write the printing output to a file instead of to the printer. You can disable this option by setting the AllowPrintToFile property to false.
+If the user selects this option the following dialog is opened by the printDocument.Print()call to ask for a file name where the printout should be written to.
+
+Insert screenshot 7582_15_21a.bmp
+
+? In the Print Range section of the dialog, only All can be selected - Pages and Selection are disabled by default. We will look at how these options can be implemented in the following section.
+? The Copies group allows the user to select the number of copies to print.
+Printing Selected Text
+Setting the AllowSelection property to true allows the user to print selected text, but you also have to change the printing code so that only the text selected gets printed. 
+Try it out - Add a Print Selection
+24. Add the highlighted code to the click handler of the Print button. 
+      private void miFilePrint_Click(object sender, System.EventArgs e)
+      {
+         if (textBoxEdit.SelectedText != "")
+         {
+            dlgPrint.AllowSelection = true;
+         }
+         if (dlgPrint.ShowDialog() == DialogResult.OK)
+         {
+               printDocument.Print();
+         }
+      }
+In our program all the lines that will be printed are setup in the OnBeginPrint() handler. Change the implementation of this method:
+      private void OnBeginPrint(object sender, 
+                                System.Drawing.Printing.PrintEventArgs e)
+      {
+         char[] param = {'\n'};
+
+         if (dlgPrint.PrinterSettings.PrintRange == PrintRange.Selection)
+         {
+            lines = textBoxEdit.SelectedText.Split(param);
+         }
+         else
+         {
+            lines = textBoxEdit.Text.Split(param);
+         }
+
+         int i = 0;
+         char[] trimParam = {'\r'};
+         foreach (string s in lines)
+         {
+            lines[i++] = s.TrimEnd(trimParam);
+         }
+      }
+Now you can build and start the program. Open a file, select some text, start the print dialog with the menu File | Print, and select the Selection option button from the Print Range group. With this selected, pressing the Print button will only print the selected text.
+How it Works
+We set the AllowSelection property to true only if some text is selected. Before we show the PrintDialog we have to check if some text is selected, and this is done by simply checking that the value of the SelectedText property of the text box is not null. If there is some text selected the property AllowSelection is set to true.
+
+         if (textBoxEdit.SelectedText != "")
+         {
+            dlgPrint.AllowSelection = true;
+         }
+
+OnBeginPrint() is called at the start of every print job. Accessing the printDialog.PrinterSettings.PrintRange property, we get the information on whether the user has chosen the Selection option. The PrintRange property takes a value from the PrintRange enumeration: AllPages, Selection, or SomePages. 
+
+         if (printDialog.PrinterSettings.PrintRange == PrintRange.Selection)
+         {
+
+If the option is indeed Selection, we get the selected text from the SelectedText property of the TextBox. This string is split up the same way as the complete text.
+
+            lines = textBoxEdit.SelectedText.Split(param);
+         }
+
+Printing Page Ranges
+Printing a range of pages can be implemented in similar way to printing a selection. The option button can be enabled by setting the AllowSomePages property to true. The user can now select the page range to print. However, where are the page boundaries in our Simple Editor? What's the last page? We should set the last page by setting the PrintDialog.PrinterSettings.ToPage property. How does the user know the page numbers he wants to print? This is no problem in a document processing application like Microsoft Word where a Print Layout can be selected as a view on the screen. This is not possible with the simple TextBox that's used in our Simple Editor application. That's the reason why we will not implement this feature in our application. 
+
+Of course, you could do this as an exercise. What must be done? The AllowSomePages property must be set to true. Before displaying the PrintDialog, you can also set the PrinterSettings.FromPage to 1 and the PrinterSettings.ToPage to the maximum page number.
+PrintDialog Properties
+Let's summarize the properties influencing the layout of the PrintDialog again with a single picture.
+
+
+****Insert figure 4982_111_06.eps. 
+Print Preview
+For the user to see what the printout will actually look like, we use a Print Preview. Implementing Print Preview can easily be done in .NET - we can use a PrintPreviewControl class that is used to preview the document in a form to show how it will be printed. The PrintPreviewDialog is a dialog that wraps the control.
+PrintPreviewDialog
+If you look at the properties and inheritance list from the MSDN documentation of the PrintPreviewDialog class, you can see that it is actually a Form and not a wrapped common dialog - the class derives from System.Windows.Forms.Form, and you can work with it as with the forms we created in the previous chapter.
+
+We will add a PrintPreviewDialog class to our Simple Editor application.
+Try it out - Add a Print Preview Dialog
+25. Add a PrintPreviewDialog component from the Toolbox onto the Windows Forms designer. Set the name to dlgPrintPreview and the Document property to printDocument. 
+Add and implement a handler for the Click event of the Print Preview menu entry. 
+      private void miFilePrintPreview_Click(object sender, 
+         System.EventArgs e)
+      {
+         dlgPrintPreview.ShowDialog();
+      }
+
+
+Insert screenshot 7582_15_24.bmp
+PrintPreviewControl
+The Print Preview in Microsoft Word and WordPad is different from the PrintPreviewDialog in that the preview in these applications doesn't show up in its own dialog, but in the main window of the application. 
+
+To do the same, you can place the PrintPreviewControl class in your form. The Document property must be set to the PrintDocument object, and the Visible property to false. In the handler you can set the Visible property to true to view the print preview. Then the PrintPreviewControl is in front of the other control as shown in the following graphic.
+
+
+Insert screenshot 49821525.bmp
+
+You can see from the title and the single File menu item that it is the main window of the Simple Editor application that is displayed. What still needs to be done is to add some elements to control the PrintPreviewControl class to do zooming, printing and display several pages of text at once. A specific toolbar can be used to make these features available. The PrintPreviewDialog class already has this implemented as you can see in the following picture with a 4-pages preview. 
+
+
+Insert screenshot 7582_15_25a.bmp[DP1]
+FontDialog and ColorDialog
+The last dialogs in this chapter we will look at are the FontDialog and the ColorDialog. 
+Here again we will only concentrate on discussing the dialogs to set the font and color, and not the Font and Color classes, as these are covered in the next chapter.
+FontDialog
+The FontDialog lets the user of the application choose a font. The user can change the font, the style, size, and the color of the font. 
+
+The following picture gives you an overview of the properties that change the elements in the dialog.
+
+
+****Insert figure 4982_111_07.eps. 
+How to use the FontDialog
+The dialog can be used in the same way as the previous dialogs. In the Windows Forms Designer the dialog can be dragged from the Toolbox and dropped to the Form such that an instance of the FontDialog gets created. 
+
+The code to use the FontDialog can look like this:
+
+         if (dlgFont.ShowDialog() == DialogResult.OK)
+         {
+            textBoxEdit.Font = dlgFont.Font;
+         }
+
+The FontDialog is displayed by calling the ShowDialog() method. If the user presses the OK button, DialogResult.OK is returned from the method. The selected font can be read by using the Font property of the FontDialog class; this font is then passed to the Font property of the TextBox.
+Properties of the FontDialog
+We have already seen a picture with properties of the FontDialog class; but now let's see what these properties are used for:
+
+Property
+Description
+AllowVectorFonts
+Boolean value that defines if vector fonts can be selected in the font list. The default is true.
+AllowVerticalFonts
+Boolean value that defines if vertical fonts can be selected in the font list. Vertical texts are used in far eastern countries. There probably isn't a vertical font installed on your system. The default is true.
+FixedPitchOnly
+Setting the property FixedPitchOnly displays only fixed pitch fonts in the font list. With a fixed pitch font every character has the same size. The default is false.
+MaxSize
+Specifying a value for the MaxSize property defines the maximum font size the user can select.
+MinSize
+Similar to MaxSize you can set the minimum font size the user can select with MinSize.
+ShowApply
+If the Apply button should be displayed you have to set the ShowApply property to true. By pressing the Apply button the user can see an updated font in the application without leaving the font dialog. 
+ShowColor
+By default the Color selection is not shown in the dialog. If you want the user to select the font color in the font dialog you just have to set the ShowColor property to true.
+ShowEffects
+By default the user can select the Strikeout and Underline check boxes to manipulate the font. If you don't want these options to be displayed you have to set the ShowEffects property to false.
+AllowScriptChange
+Setting the AllowScriptChange property to false prevents the user from changing the script of a font. The available scripts depend on the selected font, for example, the font Arial supports Western, Hebrew, Arabic, Greek, Turkish, Baltic, Central European, Cyrillic, Vietnamese scripts.
+Enabling the Apply Button
+An interesting difference from the other dialogs presented so far is that the FontDialog supports an Apply button, which is not displayed by default. If the user presses the Apply button the dialog stays opened, but the font should be applied.
+
+By selecting the FontDialog in the Windows Forms designer you can set the ShowApply property in the Properties window to True. But how are we informed if the user now presses the Apply button? The dialog is still opened, so the ShowDialog() method will not return. Instead, we can add an event handler to the Apply event of the FontDialog class. You can do this by pressing the Events button in the Properties window, and by writing a handler name to the Apply event.
+
+As you can see in the following code, I have entered the name OnApplyFontDialog. In this handler you can access the selected font of the FontDialog using the member variable of the FontDialog class:
+
+      private void OnApplyFontDialog(object sender, System.EventArgs e)
+      {
+         textBoxEdit.Font = dlgFont.Font;
+      }
+ColorDialog
+There isn't as much to configure in the ColorDialog as for the FontDialog. With the ColorDialog it is possible for the user to configure custom colors, if he doesn't want any of the basic colors on offer; this is done by setting the AllowFullOpen property. The custom color configuration part of the dialog can also be automatically expanded with the FullOpen property. If AllowFullOpen is false, then the value of FullOpen will be ignored. The SolidColorOnly property specifies that only solid colors may be selected. The CustomColors property can be used to get and set the configured custom color values.
+
+****Insert figure 4982_111_08.eps..
+How to use the Color Dialog
+The ColorDialog can be dragged from the Toolbox and dropped onto the form in the Windows Forms designer, as we have done with the other dialogs. ShowDialog() displays the dialog until the user presses the OK or Cancel button. You can read the selected color by accessing the Color property of the dialog as can be seen in the following code example:
+
+         if (dlgColor.ShowDialog() == DialogResult.OK)
+         {
+            textBoxEdit.ForeColor = dlgColor.Color;
+         }
+Properties of the Color Dialog
+The properties to influence the look of the dialog are summarized in this table:
+
+Properties
+Description
+AllowFullOpen
+Setting this property to false disables the Define Custom Colors button, thus preventing the user from defining custom colors. The default value of this property is true.
+FullOpen
+Setting the FullOpen property to true before the dialog is displayed opens up the dialog with the custom color selection automatically displayed.
+AnyColor
+Setting this property to true shows all available colors in the list of basic colors.
+CustomColors
+With the CustomColors property you can preset an array of custom colors, and you can read the custom colors defined by the user.
+SolidColorOnly
+By setting the SolidColorOnly property to true the user can only select solid colors.
+Summary
+In this chapter we have seen how to use the dialog classes in applications. We looked at how to open and to save files, and after reviewing the .NET framework printing classes, we showed you how to add printing capabilities to your applications. To summarize, in our Simple Editor application we've used the following dialog classes:
+
+? FileOpenDialog to ask the user for a file to open
+? FileSaveDialog to ask for a file name to save the data
+? PrintDialog to get the printer to print to and the printing configurations
+? PageSetupDialog to modify the margins of the page where we do the print
+? PrintPreviewDialog to view a preview of the print so that the user knows in advance how the print will look like.
+? We've also shown you the basics of the FontDialog and ColorDialog classes. Adding these classes to the Simple Editor application is part of your exercises. 
+Exercises
+Because the FontDialog and the ColorDialog work in a similar way to the other dialogs we went through in this chapter, it's an easy job to add these dialogs to our Simple Editor application.
+
+26. Let the user change the font of the text box. To make this possible add a new menu entry to the main menu: F&ormat, and a sub menu for Format: &Font... Add a handler to this menu item. Add a FontDialog to the application with the help of the Windows Forms Designer. Display this dialog in the menu handler, and set the Font property of the textbox to the selected font. 
+You also have to change the implementation of the method OnPrintPage() to use the selected font for a printout. In the previous implementation we created a new Font object in the DrawString() method of the Graphics object. Now use the font of the textBoxEdit object by accessing the Font property instead. We also have to be aware of a font location problem if the user chooses a big font. To avoid one line partly overwriting the one above/below, change the fixed value we used to change the vertical position of the lines. A better way to do this would be to use the size of the font to increment the vertical incrementor: use the Height property of the Font class.
+27. Another great extension to the Simple Editor application would be to change the font color. Add a second submenu to the Format menu entry: Color... Add a handler to this menu entry where you open up a ColorDialog. If the user presses the OK button, set the selected color of the ColorDialog to the ForeColor property of the textbox.
+In the method OnPrintPage() make sure that the chosen color is used only if the printer supports colors. You can check the color support of the printer with the PageSettings.Color property of the PrintPageEventArgs argument. You can create a brush object with the color of the textbox with this code:
+Brush brush = new SolidBrush(textBoxEdit.ForeColor);
+
+This brush can then be used as an argument in the DrawString() method instead of the black brush we used in the example before. 
+
+[DP1]not the best screenshoot

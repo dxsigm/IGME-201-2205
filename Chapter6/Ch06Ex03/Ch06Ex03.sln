@@ -1,0 +1,27 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ch06Ex03", "Ch06Ex03.csproj", "{6C475F6C-B83F-4184-8FEA-5F93FA588062}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ch10CardClient", "..\..\Chapter10\Ch10CardClient\Ch10CardClient.csproj", "{C9CD53F4-E20D-416B-A2B6-9F8271645EEC}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{6C475F6C-B83F-4184-8FEA-5F93FA588062}.Debug.ActiveCfg = Debug|.NET
+		{6C475F6C-B83F-4184-8FEA-5F93FA588062}.Debug.Build.0 = Debug|.NET
+		{6C475F6C-B83F-4184-8FEA-5F93FA588062}.Release.ActiveCfg = Release|.NET
+		{6C475F6C-B83F-4184-8FEA-5F93FA588062}.Release.Build.0 = Release|.NET
+		{C9CD53F4-E20D-416B-A2B6-9F8271645EEC}.Debug.ActiveCfg = Debug|.NET
+		{C9CD53F4-E20D-416B-A2B6-9F8271645EEC}.Debug.Build.0 = Debug|.NET
+		{C9CD53F4-E20D-416B-A2B6-9F8271645EEC}.Release.ActiveCfg = Release|.NET
+		{C9CD53F4-E20D-416B-A2B6-9F8271645EEC}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
