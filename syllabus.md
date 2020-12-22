@@ -75,7 +75,7 @@ These take-home exams, for which you will have at least 9 days to complete, cons
 ### Homework & other assignments (30%)
 Homeworks, in-class exercises, checkpoints, and other assignments are essential to learning the course material. You can expect an average of one Practice Exercise per class meeting. Keep an eye on the myCourses Assignments section for the due dates.
 
-Assignments never submitted on myCourses, or submitted LATE without a valid excuse will receive a score of ZERO for that assignment. (Procrastination is not a valid excuse). If you feel you have legitimate excuse, please contact the professor in **advance** of the due date either by email or during office hours.
+Assignments never submitted on myCourses, or submitted LATE without a valid excuse will receive a score of ZERO for that assignment. (Procrastination is not a valid excuse). If you feel you have a legitimate excuse, please contact the professor in **advance** of the due date either by email or during office hours.
 
 As far as I am able, I will review and provide feedback on assignments submitted more than 24 hours early, and you may resubmit the assignment up until the deadline.  An iterative feedback process can be a powerful learning experience, and my goal is for you to learn the material.
 
