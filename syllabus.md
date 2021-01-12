@@ -15,7 +15,7 @@ Prerequisites: C- or better in IGME-102 or equivalent course and student standin
 - Email: dxsigm@rit.edu
 - Student hours: Wed 6-8pm, Sun 10am-12pm, anytime on Slack and myCourses "Help Dropbox" in Assignments
 - Class meeting:
-    - T-Th 11:00AM - 12:15PM ET at {zoom link}
+    - T-Th 11:00AM - 12:15PM ET at https://rit.zoom.us/j/97039054271
     - All lectures will be recorded and available via links which will be posted in the "Announcement" channel on Slack and myCourses
 
 ## Course Goals and Objectives
@@ -89,8 +89,8 @@ Incomplete grades will be given only in the most exceptional circumstances, sole
 The course policy on academic dishonesty is simple: If you get caught cheating or plagiarizing, you get an "F" as a grade for the course, a letter detailing the incident goes into your records folder, and you are immediately removed from the class. (If this is a second occurrence during your career at RIT, the penalties are harsher.) Please review RIT's policy on academic dishonesty: http://www.rit.edu/~w-policy/sectionD/D8.html
 
 ## Important RIT Deadlines
--	Last day of add/drop is Wednesday, August 26, 2020.
--	Last day to withdraw with a grade of "W" is Tuesday, November 3, 2020.
+-	Last day of add/drop is Monday, Feb 1, 2021.
+-	Last day to withdraw with a grade of "W" is Wednesday, May 5, 2021.
 -	You have one semester after the class has ended to challenge your grade.
 
 ## Notices of Accommodation
