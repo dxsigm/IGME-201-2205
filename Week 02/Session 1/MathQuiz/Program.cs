@@ -18,7 +18,6 @@ namespace MathQuiz
             string myName = null;
 
             // string and int of # of questions
-            string sQuestions = null;
             int nQuestions = 0;
 
             // string and base value related to difficulty
