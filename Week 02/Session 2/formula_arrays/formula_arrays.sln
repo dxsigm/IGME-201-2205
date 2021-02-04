@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30523.141
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "formula_arrays", "formula_arrays.csproj", "{782775D6-5A84-474C-96D4-1EBCDEC0C0D1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{782775D6-5A84-474C-96D4-1EBCDEC0C0D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{782775D6-5A84-474C-96D4-1EBCDEC0C0D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{782775D6-5A84-474C-96D4-1EBCDEC0C0D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{782775D6-5A84-474C-96D4-1EBCDEC0C0D1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {66F094F9-FD54-459E-84FE-6A635DB5551B}
+	EndGlobalSection
+EndGlobal
