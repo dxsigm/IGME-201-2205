@@ -1,0 +1,20 @@
+// {type:class}
+// {generate:true}
+// {direction:topDown}
+
+[+A:Person|+name:string;+age:int;+email:string;-licenseId:int|+LicenseId:int;+Work():v]
+[+Student|+gpa:double|+Eat();+Party()]
+[+Teacher|+specialty:string|+Work();+Eat()]
+[+People|sortedList:SortedList<string,Person>|this:email|+Remove(email:string)]
+
+[+IPerson||Eat()]
+[+IStudent||Party()]
+
+[+A:Person]<-.-[+Student]
+[+A:Person]<-.-[+Teacher]
+
+[+IPerson]^[+Student]
+[+IStudent]^[+Student]
+[+IPerson]^[+Teacher]
+
+[+People||]1-0..*[+A:Person||]

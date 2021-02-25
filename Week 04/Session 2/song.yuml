@@ -1,0 +1,24 @@
+// {type:class}
+// {generate:true}
+// {direction:topDown}
+
+[+A:Song|+year:int;+lyrics:string;+composer:string;+artist:string|+Name:string;+Play():a;+Copy():v;+Dance();+Sing()]
+[+TapeSong|+tapeName:string;+side:int;+counter:int|+Play():o]
+[+VinylSong|+recordName:string;+side:int;+track:int|+Play():o]
+[+CDSong|+cdName:string;+track:int|+Play():o]
+[+MP3Song|+fileName:string|+Play():o;+Copy():o]
+
+[+Game|+players:int|+Name:string;+Play():a]
+
+[+ISong|lyrics:string;Name:string;Play();Sing();Dance();Copy()]
+[+IPlay|Name:string;Play()]
+
+[+A:Song]<-.-[+TapeSong]
+[+A:Song]<-.-[+VinylSong]
+[+A:Song]<-.-[+CDSong]
+[+A:Song]<-.-[+MP3Song]
+
+[+ISong]^[+A:Song]
+[+IPlay]^[+A:Song]
+
+[+IPlay]^[+Game]
