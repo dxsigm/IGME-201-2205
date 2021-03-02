@@ -1,0 +1,17 @@
+// {type:class}
+// {generate:true}
+// {direction:topDown}
+
+[+A:MyBase|-password:string|+Password:string;+MyAbstractMethod(a:int,b:string):string:a; +MyVirtualMethod(a:string):v]
+[-MyClass| |+MyAbstractMethod(a:int,b:string):string:o]
+[-S:MyComplexClass| |+MyMethod(d:double):double;+MyVirtualMethod(a:string):o]
+[+IMyBaseInterface|MyMethod(d:double):double]
+[-IMyBaseInterface2|]
+[-IMyInterface|]
+
+[+A:MyBase]<-.-[-MyClass]
+[-MyClass]<-[-S:MyComplexClass]
+
+[+IMyBaseInterface]^[-IMyInterface]
+[-IMyBaseInterface2]^[-IMyInterface]
+[-IMyInterface]^[-S:MyComplexClass]
