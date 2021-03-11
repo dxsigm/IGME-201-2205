@@ -228,13 +228,30 @@ namespace GameOfLife
 
         static void Main(string[] args)
         {
+            Cell cell1 = new Cell(MAX_COLS * MAX_ROWS);
+            Cell cell2 = new Cell(MAX_COLS * MAX_ROWS);
+            Cell cell3 = new Cell(MAX_COLS * MAX_ROWS);
+            Cell cell4 = new Cell(MAX_COLS * MAX_ROWS);
+            Cell cell5 = cell4;
+
+            cell2 = cell1;
+
+            int[] array1 = new int[5];
+            int[] array2 = new int[10];
+            array2 = array1;
+
+
+
+
+
+
             // loop through all rows and columns
             for (int row = 0; row < MAX_ROWS; ++row)
             {
                 for (int col = 0; col < MAX_COLS; ++col)
                 {
                     // create the cell at the current (row,col)
-                    organism[row, col] = new Cell(MAX_COLS * MAX_ROWS);
+                    organism[row, col] = new Cell(MAX_COLS * MAX_ROWS, 2);
                 }
             }
 

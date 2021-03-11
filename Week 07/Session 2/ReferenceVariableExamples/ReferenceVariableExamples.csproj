@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{36767994-6250-4AF8-9E15-CF01E3D81FFC}</ProjectGuid>
+    <ProjectGuid>{F5ED0860-2C8B-46BE-99F1-27458935FC37}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>GameOfLife</RootNamespace>
-    <AssemblyName>GameOfLife</AssemblyName>
+    <RootNamespace>ReferenceVariableExamples</RootNamespace>
+    <AssemblyName>ReferenceVariableExamples</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
